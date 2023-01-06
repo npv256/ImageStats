@@ -1,7 +1,5 @@
 import pytest
-from datetime import datetime
 from bson.objectid import ObjectId
-from app.db.database import get_db_conn
 from app.bl.images.update_status import update_status
 from tests.bl.images.confest import db, image
 

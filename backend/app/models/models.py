@@ -1,5 +1,6 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 from datetime import datetime
+from typing import List
 
 from enum import Enum
 
@@ -25,14 +26,19 @@ class ImageBase(BaseModel):
     url: str
     status: StatusType = StatusType.new
 
-    @validator("created_at", "changed_at", pre=True)
-    def default_datetime(cls, value: datetime) -> datetime:
-        return value or datetime.now()
 
-
-class ImageUpdate(BaseModel):
+class ImageUpdate(ImageBase):
     """
     Модель изображения при обновлении
     """
     status: StatusType
 
+
+class ImageGroupBase(BaseModel):
+    """
+    Модель группы изображений
+    """
+    _id: str
+    name: str
+    images: List[ImageBase]
+    count: int

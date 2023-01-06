@@ -1,10 +1,7 @@
 import pytest
-from datetime import datetime, timedelta
-from bson.objectid import ObjectId
-from app.db.database import get_db_conn
 from app.bl.images.get_groups import get_groups
-import random
 from tests.bl.images.confest import db, images
+from app.models.models import StatusType
 
 
 class TestGroupsImages:
@@ -13,18 +10,18 @@ class TestGroupsImages:
         assert res is not None
         assert len(res) == 5
         for group in res:
-            assert group.get('count') == 5
-            assert group.get('images') is not None
+            assert group.count == 5
+            assert group.images is not None
 
     def test_get_groups_by_status(self, db, images):
-        statuses = ['new', 'accepted', 'review', 'deleted']
+        statuses = [e.value for e in StatusType]
         for status in statuses:
             res = get_groups(db=db, status=status)
             assert res is not None
             for group in res:
-                group_images = group.get('images')
+                group_images = group.images
                 for image in group_images:
-                    assert image.get('status') == status
+                    assert image.status == status
 
     def test_get_groups_by_invalid_status(self, db, images):
         try:
@@ -37,12 +34,12 @@ class TestGroupsImages:
         res = get_groups(db=db)
         for group in res:
             prev_image_created_at = None
-            for image in group.get('images'):
+            for image in group.images:
                 if not prev_image_created_at:
-                    prev_image_created_at = image.get('created_at')
+                    prev_image_created_at = image.created_at
                     continue
-                assert image.get('created_at') < prev_image_created_at
-                prev_image_created_at = image.get('created_at')
+                assert image.created_at < prev_image_created_at
+                prev_image_created_at = image.created_at
 
     # TODO: Проверить что метод отработает, если в бд будет слишком много данных
     # TODO: Нет данных, метод вернет пустой список
